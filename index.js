@@ -21,23 +21,16 @@ var knex = require('knex')({
   }
 });
 
-/*
-  String sql = " SELECT oi2.PRODUCT_ID ,p.TITLE,p.THUMBNAIL " +
-                    " FROM ORDER_ITEMS oi2  " +
-                    " JOIN ORDER_ITEMS oi1 ON oi1.ORDER_ID = oi2.ORDER_ID   " +
-                    " JOIN PRODUCTS p ON p.ID = oi2.PRODUCT_ID   " +
-                    " WHERE  oi1.PRODUCT_ID = 1   " +
-                    " AND oi2.PRODUCT_ID != 1 AND ROWNUM <= 3  " + 
-                    " GROUP BY  oi2.PRODUCT_ID,p.TITLE,p.THUMBNAIL " +
-                    " ORDER BY COUNT(oi2.ID) DESC";*/
+
 /*
 knex.select().table('PRODUCTS')
 .then(data => console.log(data));
 
 */
 
-knex('ORDER_ITEMS AS oi2')
+knex
 .select('oi2.PRODUCT_ID', 'p.TITLE','p.THUMBNAIL')
+.from('ORDER_ITEMS AS oi2')
   .join('PRODUCTS AS p', 'p.ID', 'oi2.PRODUCT_ID')
   .join('ORDER_ITEMS AS oi1', 'oi1.ORDER_ID', 'oi2.ORDER_ID')
   .select('oi2.PRODUCT_ID', 'p.TITLE')
