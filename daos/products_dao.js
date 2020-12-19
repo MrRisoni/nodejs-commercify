@@ -1,5 +1,7 @@
-function  getBoughtWith(knexObj) {
-    return knexObj
+const knexConfig = require('./../knex_config');
+
+function  getBoughtWith() {
+    return knexConfig
     .select('oi2.PRODUCT_ID', 'p.TITLE','p.THUMBNAIL')
     .from('ORDER_ITEMS AS oi2')
     .join('PRODUCTS AS p', 'p.ID', 'oi2.PRODUCT_ID')
