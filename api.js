@@ -5,34 +5,16 @@ const http = require('http').Server(app);
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-const browse_controller = require('./controllers/browse_controller');
-
 
 app.use(bodyParser.json());
 app.use(cors());
 
-const knexConfig = require('./knex_config');
-
-const bCtrl = new browse_controller(knexConfig);
-
-
-app.get('/api/products/bought_with', (req, res) => {
-
-    bCtrl.getBoughtWith(req.body).then(data => {
-        res.send(data);
-
-    }).catch(err => {
-        console.log(err);
-    });
-
-});
-
-
+const productRoutes = require("./routes/product_routes");
+app.use("/", productRoutes);
 
 http.listen(port, (req, res) => {
     console.log('Server listening on port number', port);
 });
-
 
 
 

@@ -1,15 +1,7 @@
 const ProductDAO = require('../daos/products_dao.js');
 
-module.exports =
+function getBoughtWith(knexObj) {
+ return ProductDAO.getBoughtWith(knexObj);
+}
 
-    class browse_controller {
-
-        constructor(knex) {
-            this.knexObj = knex;
-        }
-
-        getBoughtWith() {
-            const self = this;
-            return ProductDAO.getBoughtWith(self.knexObj);
-        }
-    }
+module.exports = {getBoughtWith}
