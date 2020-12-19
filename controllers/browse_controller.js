@@ -1,13 +1,17 @@
 
+module.exports =
 
+    class browse_controller {
 
-/*
-knex.select().table('PRODUCTS')
-.then(data => console.log(data));
+        constructor(knex) {
 
-*/
+            this.knexObj = knex;
 
-knex
+        }
+
+        getBoughtWith() {
+            const self = this;
+            return self.knexObj
 .select('oi2.PRODUCT_ID', 'p.TITLE','p.THUMBNAIL')
 .from('ORDER_ITEMS AS oi2')
   .join('PRODUCTS AS p', 'p.ID', 'oi2.PRODUCT_ID')
@@ -17,5 +21,10 @@ knex
   .where('oi2.PRODUCT_ID', '!=', 1)
   .whereRaw(' ROWNUM < 3 ')
   .groupBy('oi2.PRODUCT_ID','p.TITLE','p.THUMBNAIL')
-  .orderByRaw(' COUNT("oi2"."ID") DESC')
-  .then(data => console.log(data));
+  .orderByRaw(' COUNT("oi2"."ID") DESC');
+        }
+
+
+     
+    
+    }
