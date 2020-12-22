@@ -17,7 +17,7 @@ function queryOrderTable(orderId)
 }
 
 function  getOrderItems(orderId = 28) {
-    var qryObj = knexConfig.select().table('order_items AS oi')
+    var qryObj = knexConfig.select('p.id AS productId','oi.quantity').table('order_items AS oi')
     .join('products AS p', 'p.id', 'oi.product_id')
     .where('order_id','=',orderId);
     console.log(qryObj.toSQL().toNative());
