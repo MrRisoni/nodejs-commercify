@@ -1,2 +1,2 @@
-e shopping platform (knex.js,OracleDB)
+e shopping platform (knex.js,MySQL)
 
