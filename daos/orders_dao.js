@@ -128,8 +128,15 @@ function queryOrderTable(orderId)
 }
 
 function  getOrderItems(orderId = 28) {
-    var qryObj = knexConfig.select('p.id AS productId','oi.quantity').table('order_items AS oi')
+    var qryObj = knexConfig.select('p.id AS productId','p.title','oi.quantity','p.thumbnail_url',
+    'p.kilos','p.dim_l AS length','p.dim_w AS width','p.dim_h AS height',
+     'm.title AS manufacturer','order_status.title AS status',
+     'oi.tracking_no','oi.dispatched_on','oi.expected_on','oi.arrived_on',
+     'oi.net_price','oi.taxes','oi.gift_cost','oi.success','oi.void','oi.refund')
+    .table('order_items AS oi')
     .join('products AS p', 'p.id', 'oi.product_id')
+    .join('order_status', 'order_status.id', 'oi.status_id')
+    .join('shop_manufacturers AS m', 'p.manufacturer_id', 'm.id')
     .where('order_id','=',orderId);
     console.log(qryObj.toSQL().toNative());
     return qryObj;
