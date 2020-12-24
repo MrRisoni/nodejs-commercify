@@ -2,13 +2,44 @@ const knexConfig = require('./../knex_config');
 
 function  getOrderDetails(orderId = 28) {
     return new Promise((resolve,reject) => {
-        Promise.all([queryOrderTable(orderId), getOrderItems(orderId)]).then(values => {
+        Promise.all([queryOrderTable(orderId), getOrderItems(orderId),
+            getOrderHistory(orderId),
+            getOrderItemHistory(orderId)]).then(values => {
             resolve({order:values[0],
-                items:values[1]});
+                items:values[1],
+                orderHistory:values[2],
+                orderItemHistory:values[3]
+
+            });
           });
     });
    
 }
+
+function getOrderHistory(orderId)
+{
+    var qryObj = knexConfig.select('osh.created_at','os.title')
+    .table('orders_status_history AS osh').where('osh.order_id','=',orderId)
+    .join('order_status AS os', 'os.id', 'osh.status_id')
+    .orderBy('osh.created_at', 'desc')
+
+    return qryObj;
+}
+
+function getOrderItemHistory(orderId)
+{
+    var qryObj = knexConfig.select('oish.item_id','oish.created_at','os.title')
+    .table('order_items_status_history AS oish')
+    .join('order_status AS os', 'os.id', 'oish.status_id')
+    .join('order_items AS oi', 'oi.id', 'oish.item_id')
+    .where('oi.order_id','=',orderId)
+    .orderBy('oish.item_id', 'desc')
+    .orderBy('oish.created_at', 'desc')
+
+    return qryObj;
+}
+
+
 
 function queryOrderTable(orderId)
 {
@@ -19,9 +50,23 @@ function queryOrderTable(orderId)
     'ba.id AS billingAddressId','ba.country_code AS billCountryCode',
     'ba.city AS billCity','ba.full_name AS billFullName','ba.address AS billAddress',
     '.ba.street_no AS billStreetNo','ba.post_code AS billPostCode',
-    'ba.contact_mobile AS billContactMobile'
-    ).table('orders AS o').where('o.id','=',orderId)
+    'ba.contact_mobile AS billContactMobile',
+    'sa.id AS shippingAddressId','sa.country_code AS shippCountryCode',
+    'sa.city AS shipCity','sa.full_name AS shipFullName','sa.address AS shipAddress',
+    '.sa.street_no AS shipStreetNo','ba.post_code AS shipPostCode',
+    'sa.contact_mobile AS shipContactMobile',
+    'shops.id AS shopId','shops.title AS shopTitle',
+    'order_status.title AS statusTitle',
+    'payment_methods.title AS payMethodTitle',
+    'bank.transaction_id','bank.card_type','bank.transaction_id')
+    .table('orders AS o').where('o.id','=',orderId)
     .join('billing_address AS ba', 'ba.id', 'o.billing_address_id')
+    .join('shipping_address AS sa', 'sa.id', 'o.shipping_address_id')
+    .join('shops', 'shops.id', 'o.shop_id')
+    .join('order_status', 'order_status.id', 'o.status_id')
+    .join('payment_methods', 'payment_methods.id', 'o.pay_method_id')
+    .leftJoin('bank_transactions AS bank', 'bank.order_id', 'o.id')
+
    // console.log(qryObj.toSQL().toNative());
     
    return new Promise ((resolve,reject) => {
@@ -37,7 +82,29 @@ function queryOrderTable(orderId)
                     billAddress: data[0].billAddress,
                     billStreetNo: data[0].billStreetNo,
                     billPostCode: data[0].billPostCode,
-
+                },
+                shop :{
+                    id: data[0].shopId,
+                    title: data[0].shopTitle
+                },
+                status: {
+                    title:  data[0].statusTitle
+                },
+                payMethod: {
+                    title:  data[0].payMethodTitle
+                },
+                bankData: {
+                    transactionId : data[0].transaction_id
+                },
+                shippingAddress: {
+                    id: data[0].shippingAddressId,
+                    shippCountryCode: data[0].shippCountryCode,
+                    shipContactMobile: data[0].shipContactMobile,
+                    shipCity: data[0].shipCity,
+                    shipFullName: data[0].shipFullName,
+                    billAddress: data[0].shipAddress,
+                    shipStreetNo: data[0].shipStreetNo,
+                    shipPostCode: data[0].shipPostCode,
                 },
                 details: {id: data[0].orderId, 
                     currency: data[0].currency,
