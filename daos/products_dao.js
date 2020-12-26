@@ -17,4 +17,37 @@ function  getBoughtWith(productId = 4408) {
     return knexConfig.raw('CALL FrequentlyBoughtWith (?)', [productId])
 }
 
-module.exports = {getBoughtWith}
+function getProduct(productId = 4408)
+{
+    var productQry = knexConfig.select('p.*','pc.title AS catTitle','sh.id AS shopId',
+    'sh.title AS shopTitle','m.title AS manufacturer')
+    .from('products AS p')
+    .join('product_categories AS pc', 'pc.id', 'p.category_id')
+    .join('shop_manufacturers AS m', 'm.id', 'p.manufacturer_id')
+    .join('shops AS sh', 'sh.id', 'p.shop_id')
+    .where('p.id', '=', productId)
+
+    var reviewsQry = knexConfig.select('r.stars','r.created','r.comment','u.username')
+    .from('product_reviews AS r')
+    .join('users AS u', 'u.id', 'r.user_id')
+    .where('r.product_id', '=', productId)
+    .orderBy('r.created','desc');
+
+    var galleryQry = knexConfig.select('g.*')
+    .from('product_gallery AS g')
+    .where('g.product_id', '=', productId)
+
+
+    return new Promise((resolve,reject) => {
+        Promise.all([productQry, reviewsQry, galleryQry]).then(values => {
+            resolve({product:values[0],
+                review:values[1],
+                gallery:values[2]
+
+            });
+          });
+    });
+    
+}
+
+module.exports = {getBoughtWith,getProduct}
